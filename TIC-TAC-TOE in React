@@ -1,0 +1,185 @@
+JS (Babel)
+
+function Square(props) {
+  return (
+      <button class='square' 
+          disabled={props.disabled}
+          onClick={props.onClick}>
+          {props.value}
+       </button>
+     );
+ }
+
+
+class Board extends React.Component {
+  constructor(props){
+    super(props);
+  }
+  
+ renderSquare(i) {
+    return(
+      <Square value={this.props.squares[i]}
+        onClick={() => this.props.onClick(i)}
+        disabled={this.props.disabled}
+     />
+     ); 
+  }
+  
+  render() {
+    return(
+     <div> 
+      
+      <div class='first-row'>
+        
+       {this.renderSquare(0)}
+       {this.renderSquare(1)}
+       {this.renderSquare(2)}
+      </div>
+      
+      <div class='second-row'>
+        {this.renderSquare(3)}
+        {this.renderSquare(4)}
+        {this.renderSquare(5)}
+      </div>
+      
+       <div class='third-row'>
+        {this.renderSquare(6)}
+        {this.renderSquare(7)}
+        {this.renderSquare(8)}
+       </div>
+     
+     </div>   
+      
+    );
+  }
+}
+
+
+
+class Game extends React.Component {
+  
+  constructor(props) {
+    super(props);
+    this.state = {
+      squares: Array(9).fill(null),
+      xIsNext: true,
+    };
+    this.handleClick =this.handleClick.bind(this);
+  }
+  
+  
+ 
+  handleClick(i) {
+    const squares = this.state.squares.slice();
+    
+    if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
+    
+    squares[i] = this.state.xIsNext ? 'X' : 'O';
+    
+    this.setState({
+      squares: squares,
+      xIsNext: !this.state.xIsNext
+    });
+    
+  }
+  
+  
+render() {
+ 
+  const winner = calculateWinner(this.state.squares);
+  
+  const status = winner ? ('Winner is: ' + winner) : 'Next Player: ' +      (this.state.xIsNext ? 'X': 'O');
+  console.log(status);
+  
+  const disableButton = winner ? true : false;
+  
+  return (
+    <div class='main'>
+      
+      <div class='board'> 
+        <Board squares={this.state.squares}
+               onClick = {(i) => this.handleClick(i)}
+               disabled={disableButton}
+         />
+      </div> 
+     
+      <div class='status'>
+        <h1>{status}</h1> 
+      </div>  
+      
+    </div>
+    );
+ }
+}  
+  
+
+ReactDOM.render(<Game />, document.getElementById('root'));
+
+
+function calculateWinner(squares) {
+    const winningPosns = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6]
+    ];
+    const squaresCopy = squares.slice();
+    
+    for (let i = 0; i< winningPosns.length; i++) {
+      const [a,b,c]  = winningPosns[i];
+      
+      if (squaresCopy[a] === squaresCopy[b] && squaresCopy[a] === squaresCopy[c] && squaresCopy[a] !== null) {
+        
+        return squaresCopy[a];
+      } 
+    }
+    return null;
+  }
+
+
+//---------------------------------------------
+
+CSS:
+
+body{
+  background-color:#000000;
+  color: #ffffff;
+}
+
+.square{
+  height: 100px;
+  width: 100px;
+  margin-right: -1px;
+  margin-top:-1px;
+  font-size: 50px;
+  text-decoration: bold;
+  vertical-align: top;
+} 
+
+.first-row{
+  margin-top: 50px;
+} 
+
+.main{
+  display: flex;
+  flex-direction: row;
+}
+.board{
+  margin-left: 50px;
+}
+
+.status{
+  margin-top: 150px;
+  margin-left: 50px;
+}
+ 
+//---------------------------------------
+
+HTML:
+<div id='root'></div>
